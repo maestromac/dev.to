@@ -12,6 +12,15 @@ Rails.application.routes.draw do
     get "/enter" => "registrations#new", as: :new_user_registration_path
   end
 
+  # match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => %i[get post]
+  # resources :delayed_job_web, only: [:get, :post]
+  #
+  # authenticated :user do
+  #   mount DelayedJobWeb, at: "/delayed_job"
+  # end
+
+  mount DelayedJobWeb, at: "/delayed_job"
+
   namespace :admin do
     # Check administrate gem docs
     DashboardManifest::DASHBOARDS.each do |dashboard_resource|
