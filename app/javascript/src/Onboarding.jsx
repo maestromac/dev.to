@@ -1,10 +1,11 @@
-import { h, render, Component } from 'preact';
+import { h, Component } from 'preact';
 import OnboardingWelcome from './components/OnboardingWelcome';
 import OnboardingFollowTags from './components/OnboardingFollowTags';
 import OnboardingFollowUsers from './components/OnboardingFollowUsers';
 import OnboardingWelcomeThread from './components/OnboardingWelcomeThread';
 import cancelSvg from '../../assets/images/cancel.svg';
 import OnboardingProfile from './components/OnboardingProfile';
+import * as apiUtil from './utils/onboardingUtils';
 
 const getContentOfToken = token =>
   document.querySelector(`meta[name='${token}']`).content;
@@ -36,8 +37,8 @@ export default class Onboarding extends Component {
   }
 
   getUserTags = () => {
-    fetch('/api/tags/onboarding')
-      .then(response => response.json())
+    apiUtil
+      .getOnboardingTags()
       .then(json => {
         const followedTagNames = JSON.parse(
           document.body.getAttribute('data-user'),
@@ -63,16 +64,11 @@ export default class Onboarding extends Component {
   };
 
   getUsersToFollow = () => {
-    fetch('/api/users?state=follow_suggestions', {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'same-origin',
-    })
-      .then(response => response.json())
+    apiUtil
+      .getUsersToFollow()
       .then(json => {
-        if (this.state.users.length === 0) {
+        const { users } = this.state;
+        if (users.length === 0) {
           this.setState({ users: json, checkedUsers: json });
         }
       })
@@ -82,20 +78,14 @@ export default class Onboarding extends Component {
   };
 
   handleBulkFollowUsers = users => {
-    if (this.state.checkedUsers.length > 0 && !this.state.followRequestSent) {
+    const { checkedUsers, followRequestSent } = this.state;
+    if (checkedUsers.length > 0 && !followRequestSent) {
       const csrfToken = getContentOfToken('csrf-token');
       const formData = getFormDataAndAppend([
         { key: 'users', value: JSON.stringify(users) },
       ]);
 
-      fetch('/api/follows', {
-        method: 'POST',
-        headers: {
-          'X-CSRF-Token': csrfToken,
-        },
-        body: formData,
-        credentials: 'same-origin',
-      }).then(response => {
+      apiUtil.sendFollowRequest(csrfToken, formData).then(response => {
         if (response.ok) {
           this.setState({ followRequestSent: true });
         }
@@ -105,18 +95,12 @@ export default class Onboarding extends Component {
 
   handleUserProfileSave = () => {
     const csrfToken = getContentOfToken('csrf-token');
+    const { profileInfo } = this.state;
     const formData = getFormDataAndAppend([
-      { key: 'user', value: JSON.stringify(this.state.profileInfo) },
+      { key: 'user', value: JSON.stringify(profileInfo) },
     ]);
 
-    fetch('/onboarding_update', {
-      method: 'PATCH',
-      headers: {
-        'X-CSRF-Token': csrfToken,
-      },
-      body: formData,
-      credentials: 'same-origin',
-    }).then(response => {
+    apiUtil.sendOnboardingUpdate(csrfToken, formData).then(response => {
       if (response.ok) {
         this.setState({ saveRequestSent: true });
       }
@@ -152,28 +136,20 @@ export default class Onboarding extends Component {
         // add in optimistic rendering
       }),
     });
-    fetch('/follows', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-Token': csrfToken,
-      },
-      body: formData,
-      credentials: 'same-origin',
-    })
-      .then(response =>
-        response.json().then(json => {
-          this.setState({
-            allTags: this.state.allTags.map(currentTag => {
-              const newTag = currentTag;
-              if (currentTag.name === tag.name) {
-                newTag.following = json.outcome === 'followed';
-              }
-              return newTag;
-              // add in optimistic rendering
-            }),
-          });
-        }),
-      )
+    apiUtil
+      .sendFollowUpdate(csrfToken, formData)
+      .then(json => {
+        this.setState({
+          allTags: this.state.allTags.map(currentTag => {
+            const newTag = currentTag;
+            if (currentTag.name === tag.name) {
+              newTag.following = json.outcome === 'followed';
+            }
+            return newTag;
+            // add in optimistic rendering
+          }),
+        });
+      })
       .catch(error => {
         console.log(error);
       });
@@ -273,15 +249,8 @@ export default class Onboarding extends Component {
         null,
       );
     }
-    fetch('/onboarding_update', {
-      method: 'PATCH',
-      headers: {
-        'X-CSRF-Token': csrfToken,
-      },
-      body: formData,
-      credentials: 'same-origin',
-    })
-      .then(response => response.json())
+    apiUtil
+      .sendOnboardingUpdate(csrfToken, formData)
       .then(json => {
         this.setState({ showOnboarding: json.outcome === 'onboarding opened' });
         // console.log('this is special')
