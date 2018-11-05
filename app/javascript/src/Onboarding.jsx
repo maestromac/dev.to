@@ -6,51 +6,36 @@ import OnboardingWelcomeThread from './components/OnboardingWelcomeThread';
 import cancelSvg from '../../assets/images/cancel.svg';
 import OnboardingProfile from './components/OnboardingProfile';
 
-const getContentOfToken = token => document.querySelector(`meta[name='${token}']`).content;
+const getContentOfToken = token =>
+  document.querySelector(`meta[name='${token}']`).content;
 const getFormDataAndAppend = array => {
   const form = new FormData();
   array.forEach(item => form.append(item.key, item.value));
   return form;
-}
+};
 
-class Onboarding extends Component {
-  constructor() {
-    super();
-    this.handleNextButton = this.handleNextButton.bind(this);
-    this.handleBackButton = this.handleBackButton.bind(this);
-    this.closeOnboarding = this.closeOnboarding.bind(this);
-    this.handleFollowTag = this.handleFollowTag.bind(this);
-    this.handleNextHover = this.handleNextHover.bind(this);
-    this.updateUserData = this.updateUserData.bind(this);
-    this.getUserTags = this.getUserTags.bind(this);
-    this.handleCheckAllUsers = this.handleCheckAllUsers.bind(this);
-    this.handleCheckUser = this.handleCheckUser.bind(this);
-    this.handleSaveAllArticles = this.handleSaveAllArticles.bind(this);
-    this.handleSaveArticle = this.handleSaveArticle.bind(this);
-    this.handleProfileChange = this.handleProfileChange.bind(this);
-    this.getUsersToFollow = this.getUsersToFollow.bind(this);
-    this.state = {
-      pageNumber: 1,
-      showOnboarding: false,
-      userData: null,
-      allTags: [],
-      users: [],
-      checkedUsers: [],
-      followRequestSent: false,
-      articles: [],
-      savedArticles: [],
-      saveRequestSent: false,
-      profileInfo: {}
-    };
-  }
+export default class Onboarding extends Component {
+  state = {
+    pageNumber: 1,
+    showOnboarding: false,
+    userData: null,
+    allTags: [],
+    users: [],
+    checkedUsers: [],
+    followRequestSent: false,
+    articles: [],
+    savedArticles: [],
+    saveRequestSent: false,
+    profileInfo: {},
+  };
 
   componentDidMount() {
     this.updateUserData();
     this.getUserTags();
-    document.getElementsByTagName("body")[0].classList.add("modal-open");
+    document.getElementsByTagName('body')[0].classList.add('modal-open');
   }
 
-  getUserTags() {
+  getUserTags = () => {
     fetch('/api/tags/onboarding')
       .then(response => response.json())
       .then(json => {
@@ -75,9 +60,9 @@ class Onboarding extends Component {
       .catch(error => {
         console.log(error);
       });
-  }
+  };
 
-  getUsersToFollow() {
+  getUsersToFollow = () => {
     fetch('/api/users?state=follow_suggestions', {
       headers: {
         Accept: 'application/json',
@@ -94,12 +79,14 @@ class Onboarding extends Component {
       .catch(error => {
         console.log(error);
       });
-  }
+  };
 
-  handleBulkFollowUsers(users) {
+  handleBulkFollowUsers = users => {
     if (this.state.checkedUsers.length > 0 && !this.state.followRequestSent) {
       const csrfToken = getContentOfToken('csrf-token');
-      const formData = getFormDataAndAppend([{ key: 'users', value: JSON.stringify(users) }]);
+      const formData = getFormDataAndAppend([
+        { key: 'users', value: JSON.stringify(users) },
+      ]);
 
       fetch('/api/follows', {
         method: 'POST',
@@ -114,27 +101,29 @@ class Onboarding extends Component {
         }
       });
     }
-  }
+  };
 
-  handleUserProfileSave() {
-      const csrfToken = getContentOfToken('csrf-token');
-      const formData = getFormDataAndAppend([{ key: 'user', value: JSON.stringify(this.state.profileInfo) }]);
+  handleUserProfileSave = () => {
+    const csrfToken = getContentOfToken('csrf-token');
+    const formData = getFormDataAndAppend([
+      { key: 'user', value: JSON.stringify(this.state.profileInfo) },
+    ]);
 
-      fetch('/onboarding_update', {
-        method: 'PATCH',
-        headers: {
-          'X-CSRF-Token': csrfToken,
-        },
-        body: formData,
-        credentials: 'same-origin',
-      }).then(response => {
-        if (response.ok) {
-          this.setState({ saveRequestSent: true });
-        }
-      });
-  }
+    fetch('/onboarding_update', {
+      method: 'PATCH',
+      headers: {
+        'X-CSRF-Token': csrfToken,
+      },
+      body: formData,
+      credentials: 'same-origin',
+    }).then(response => {
+      if (response.ok) {
+        this.setState({ saveRequestSent: true });
+      }
+    });
+  };
 
-  updateUserData() {
+  updateUserData = () => {
     this.setState({
       userData: JSON.parse(document.body.getAttribute('data-user')),
     });
@@ -143,14 +132,14 @@ class Onboarding extends Component {
     } else {
       this.setState({ showOnboarding: true });
     }
-  }
+  };
 
-  handleFollowTag(tag) {
+  handleFollowTag = tag => {
     const csrfToken = getContentOfToken('csrf-token');
     const formData = getFormDataAndAppend([
       { key: 'followable_type', value: 'Tag' },
       { key: 'followable_id', value: tag.id },
-      { key: 'verb', value: tag.following ? 'unfollow' : 'follow' }
+      { key: 'verb', value: tag.following ? 'unfollow' : 'follow' },
     ]);
 
     this.setState({
@@ -188,23 +177,23 @@ class Onboarding extends Component {
       .catch(error => {
         console.log(error);
       });
-  }
+  };
 
-  handleCheckAllUsers() {
+  handleCheckAllUsers = () => {
     if (this.state.checkedUsers.length < this.state.users.length) {
       this.setState({ checkedUsers: this.state.users.slice() });
     } else {
       this.setState({ checkedUsers: [] });
     }
-  }
+  };
 
-  handleProfileChange(event) {
-    let newProfileInfo = this.state.profileInfo;
+  handleProfileChange = event => {
+    const newProfileInfo = this.state.profileInfo;
     newProfileInfo[event.target.name] = event.target.value;
-    this.setState({profileInfo: newProfileInfo})
-  }
+    this.setState({ profileInfo: newProfileInfo });
+  };
 
-  handleCheckUser(user) {
+  handleCheckUser = user => {
     const newCheckedUsers = this.state.checkedUsers.slice();
     if (this.state.checkedUsers.indexOf(user) > -1) {
       const index = newCheckedUsers.indexOf(user);
@@ -213,17 +202,17 @@ class Onboarding extends Component {
       newCheckedUsers.push(user);
     }
     this.setState({ checkedUsers: newCheckedUsers });
-  }
+  };
 
-  handleSaveAllArticles() {
+  handleSaveAllArticles = () => {
     if (this.state.savedArticles.length < this.state.articles.length) {
       this.setState({ savedArticles: this.state.articles.slice() });
     } else {
       this.setState({ savedArticles: [] });
     }
-  }
+  };
 
-  handleSaveArticle(article) {
+  handleSaveArticle = article => {
     const newSavedArticles = this.state.savedArticles.slice();
     if (this.state.savedArticles.indexOf(article) > -1) {
       const index = newSavedArticles.indexOf(article);
@@ -232,15 +221,15 @@ class Onboarding extends Component {
       newSavedArticles.push(article);
     }
     this.setState({ savedArticles: newSavedArticles });
-  }
+  };
 
-  handleNextHover() {
+  handleNextHover = () => {
     if (this.state.pageNumber === 2 && this.state.users.length === 0) {
       this.getUsersToFollow();
     }
-  }
+  };
 
-  handleNextButton() {
+  handleNextButton = () => {
     if (
       this.state.pageNumber === 2 &&
       this.state.users.length === 0 &&
@@ -252,32 +241,37 @@ class Onboarding extends Component {
       this.setState({ pageNumber: this.state.pageNumber + 1 });
       if (this.state.pageNumber === 4 && this.state.checkedUsers.length > 0) {
         this.handleBulkFollowUsers(this.state.checkedUsers);
-      } else if (
-        this.state.pageNumber === 5
-      ) {
+      } else if (this.state.pageNumber === 5) {
         this.handleUserProfileSave(this.state.profileInfo);
       }
     } else if (this.state.pageNumber === 5) {
       this.closeOnboarding();
     }
-    const sloan = document.getElementById("sloan-mascot-onboarding-area");
-  }
+    const sloan = document.getElementById('sloan-mascot-onboarding-area');
+  };
 
-  handleBackButton() {
+  handleBackButton = () => {
     if (this.state.pageNumber > 1) {
       this.setState({ pageNumber: this.state.pageNumber - 1 });
     }
-  }
+  };
 
-  closeOnboarding() {
+  closeOnboarding = () => {
     document.getElementsByTagName('body')[0].classList.remove('modal-open');
     const csrfToken = getContentOfToken('csrf-token');
     const formData = getFormDataAndAppend([
-      { key: 'saw_onboarding', value: true }
+      { key: 'saw_onboarding', value: true },
     ]);
 
     if (window.ga && ga.create) {
-      ga('send', 'event', 'click', 'close onboarding slide', this.state.pageNumber, null)
+      ga(
+        'send',
+        'event',
+        'click',
+        'close onboarding slide',
+        this.state.pageNumber,
+        null,
+      );
     }
     fetch('/onboarding_update', {
       method: 'PATCH',
@@ -296,12 +290,13 @@ class Onboarding extends Component {
       .catch(error => {
         console.log(error);
       });
-  }
+  };
 
-  toggleOnboardingSlide() {
+  toggleOnboardingSlide = () => {
     if (this.state.pageNumber === 1) {
       return <OnboardingWelcome />;
-    } else if (this.state.pageNumber === 2) {
+    }
+    if (this.state.pageNumber === 2) {
       return (
         <OnboardingFollowTags
           userData={this.state.userData}
@@ -310,7 +305,8 @@ class Onboarding extends Component {
           handleFollowTag={this.handleFollowTag}
         />
       );
-    } else if (this.state.pageNumber === 3) {
+    }
+    if (this.state.pageNumber === 3) {
       return (
         <OnboardingFollowUsers
           users={this.state.users}
@@ -319,50 +315,65 @@ class Onboarding extends Component {
           handleCheckAllUsers={this.handleCheckAllUsers}
         />
       );
-    } else if (this.state.pageNumber === 4) {
-      return (
-        <OnboardingProfile
-        onChange={this.handleProfileChange}
-        />
-      );
-    } else if (this.state.pageNumber === 5) {
+    }
+    if (this.state.pageNumber === 4) {
+      return <OnboardingProfile onChange={this.handleProfileChange} />;
+    }
+    if (this.state.pageNumber === 5) {
       return <OnboardingWelcomeThread />;
     }
-  }
+  };
 
-  renderBackButton() {
+  renderBackButton = () => {
     if (this.state.pageNumber > 1) {
       return (
         <button className="button cta" onClick={this.handleBackButton}>
           {' '}
-          BACK{' '}
+          BACK
+          {' '}
         </button>
       );
     }
-  }
+  };
 
-  renderNextButton() {
-    return (
-      <button
-        className="button cta"
-        onClick={this.handleNextButton}
-        onMouseOver={this.handleNextHover}
-        onFocus={this.handleNextHover}
-      >
-        {this.state.pageNumber < 5 ? 'NEXT' : "LET'S GO"}
-      </button>
-    );
-  }
+  renderNextButton = () => (
+    <button
+      className="button cta"
+      onClick={this.handleNextButton}
+      onMouseOver={this.handleNextHover}
+      onFocus={this.handleNextHover}
+    >
+      {this.state.pageNumber < 5 ? 'NEXT' : "LET'S GO"}
+    </button>
+  );
 
-  renderPageIndicators() {
-      return <div class='pageindicators'>
-                <div class={this.state.pageNumber === 2 ? 'pageindicator pageindicator--active': 'pageindicator'}></div>
-                <div class={this.state.pageNumber === 3 ? 'pageindicator pageindicator--active' : 'pageindicator'}></div>
-                <div class={this.state.pageNumber === 4 ? 'pageindicator pageindicator--active' : 'pageindicator'}></div>
-              </div>
-  }
+  renderPageIndicators = () => (
+    <div className="pageindicators">
+      <div
+        className={
+          this.state.pageNumber === 2
+            ? 'pageindicator pageindicator--active'
+            : 'pageindicator'
+        }
+      />
+      <div
+        className={
+          this.state.pageNumber === 3
+            ? 'pageindicator pageindicator--active'
+            : 'pageindicator'
+        }
+      />
+      <div
+        className={
+          this.state.pageNumber === 4
+            ? 'pageindicator pageindicator--active'
+            : 'pageindicator'
+        }
+      />
+    </div>
+  );
 
-  renderSloanMessage() {
+  renderSloanMessage = () => {
     const messages = {
       1: 'WELCOME!',
       2: 'FOLLOW TAGS',
@@ -371,7 +382,7 @@ class Onboarding extends Component {
       5: 'GET INVOLVED',
     };
     return messages[this.state.pageNumber];
-  }
+  };
 
   render() {
     if (this.state.showOnboarding) {
@@ -389,7 +400,10 @@ class Onboarding extends Component {
               </div>
             </div>
             <div className="modal-body">
-              <div id="sloan-mascot-onboarding-area" className="sloan-bar wiggle">
+              <div
+                id="sloan-mascot-onboarding-area"
+                className="sloan-bar wiggle"
+              >
                 <img
                   src="https://res.cloudinary.com/practicaldev/image/fetch/s--iiubRINO--/c_imagga_scale,f_auto,fl_progressive,q_auto,w_300/https://practicaldev-herokuapp-com.freetls.fastly.net/assets/sloan.png"
                   className="sloan-img"
@@ -412,5 +426,3 @@ class Onboarding extends Component {
     }
   }
 }
-
-export default Onboarding;
