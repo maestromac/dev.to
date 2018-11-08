@@ -5,7 +5,9 @@ import OnboardingFollowUsers from './components/OnboardingFollowUsers';
 import OnboardingWelcomeThread from './components/OnboardingWelcomeThread';
 import cancelSvg from '../../assets/images/cancel.svg';
 import OnboardingProfile from './components/OnboardingProfile';
-import * as apiUtil from './utils/onboardingUtils';
+import * as apiUtil from './utils/apiUtils';
+import * as helper from './utils/onboardingHelper';
+import 'preact/devtools';
 
 const getContentOfToken = token =>
   document.querySelector(`meta[name='${token}']`).content;
@@ -31,128 +33,81 @@ export default class Onboarding extends Component {
   };
 
   componentDidMount() {
+    window.onboardingCsrfToken = getContentOfToken('csrf-token');
     this.updateUserData();
     this.getUserTags();
     document.getElementsByTagName('body')[0].classList.add('modal-open');
   }
 
-  getUserTags = () => {
-    apiUtil
-      .getOnboardingTags()
-      .then(json => {
-        const followedTagNames = JSON.parse(
-          document.body.getAttribute('data-user'),
-        ).followed_tag_names;
-        function checkFollowingStatus(followedTags, jsonTags) {
-          const newJSON = jsonTags;
-          jsonTags.map((tag, index) => {
-            if (followedTags.includes(tag.name)) {
-              newJSON[index].following = true;
-            } else {
-              newJSON[index].following = false;
-            }
-            return newJSON;
-          });
-          return newJSON;
-        }
-        const updatedJSON = checkFollowingStatus(followedTagNames, json);
-        this.setState({ allTags: updatedJSON });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  getUserTags = async () => {
+    const tagArray = await apiUtil.getOnboardingTags();
+    const tags = tagArray.reduce(
+      (acc, tag) => ({ ...acc, [tag.name]: { ...tag, following: false } }),
+      {},
+    );
+    const { userData } = this.state;
+    userData.followed_tag_names.forEach(followingTag => {
+      if (Object.prototype.hasOwnProperty.call(tags, followingTag)) {
+        tags[followingTag].following = true;
+      }
+    });
+    this.setState({ allTags: tags });
   };
 
-  getUsersToFollow = () => {
-    apiUtil
-      .getUsersToFollow()
-      .then(json => {
-        const { users } = this.state;
-        if (users.length === 0) {
-          this.setState({ users: json, checkedUsers: json });
-        }
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  getUsersToFollow = async () => {
+    const { users } = this.state;
+    if (users.length > 0) return;
+    const json = await apiUtil.getUsersToFollow();
+    this.setState({ users: json, checkedUsers: json });
   };
 
-  handleBulkFollowUsers = users => {
+  handleBulkFollowUsers = async users => {
     const { checkedUsers, followRequestSent } = this.state;
+
     if (checkedUsers.length > 0 && !followRequestSent) {
-      const csrfToken = getContentOfToken('csrf-token');
       const formData = getFormDataAndAppend([
         { key: 'users', value: JSON.stringify(users) },
       ]);
 
-      apiUtil.sendFollowRequest(csrfToken, formData).then(response => {
-        if (response.ok) {
-          this.setState({ followRequestSent: true });
-        }
-      });
+      const response = await apiUtil.sendBulkFollowRequest(formData);
+      this.setState({ followRequestSent: response.ok });
     }
   };
 
-  handleUserProfileSave = () => {
-    const csrfToken = getContentOfToken('csrf-token');
+  handleUserProfileSave = async () => {
     const { profileInfo } = this.state;
     const formData = getFormDataAndAppend([
       { key: 'user', value: JSON.stringify(profileInfo) },
     ]);
 
-    apiUtil.sendOnboardingUpdate(csrfToken, formData).then(response => {
-      if (response.ok) {
-        this.setState({ saveRequestSent: true });
-      }
-    });
+    const response = await apiUtil.sendOnboardingUpdate(formData);
+    this.setState({ saveRequestSent: response.ok });
   };
 
   updateUserData = () => {
+    const receivedData = JSON.parse(document.body.getAttribute('data-user'));
     this.setState({
-      userData: JSON.parse(document.body.getAttribute('data-user')),
+      userData: receivedData,
+      showOnboarding: receivedData.saw_onboarding,
     });
-    if (this.state.userData.saw_onboarding === true) {
-      this.setState({ showOnboarding: false });
-    } else {
-      this.setState({ showOnboarding: true });
-    }
   };
 
-  handleFollowTag = tag => {
-    const csrfToken = getContentOfToken('csrf-token');
+  handleFollowTag = async tag => {
     const formData = getFormDataAndAppend([
       { key: 'followable_type', value: 'Tag' },
       { key: 'followable_id', value: tag.id },
       { key: 'verb', value: tag.following ? 'unfollow' : 'follow' },
     ]);
 
+    const { allTags } = this.state;
+    const followedTag = Object.assign({}, allTags[tag.name]);
+    followedTag.following = true;
     this.setState({
-      allTags: this.state.allTags.map(currentTag => {
-        const newTag = currentTag;
-        if (currentTag.name === tag.name) {
-          newTag.following = true;
-        }
-        return newTag;
-        // add in optimistic rendering
-      }),
+      allTags: { ...allTags, [followedTag.name]: followedTag },
     });
-    apiUtil
-      .sendFollowUpdate(csrfToken, formData)
-      .then(json => {
-        this.setState({
-          allTags: this.state.allTags.map(currentTag => {
-            const newTag = currentTag;
-            if (currentTag.name === tag.name) {
-              newTag.following = json.outcome === 'followed';
-            }
-            return newTag;
-            // add in optimistic rendering
-          }),
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+
+    const json = await apiUtil.sendFollowUpdate(formData);
+    const outcome = json.outcome === 'followed';
   };
 
   handleCheckAllUsers = () => {
@@ -232,9 +187,8 @@ export default class Onboarding extends Component {
     }
   };
 
-  closeOnboarding = () => {
+  closeOnboarding = async () => {
     document.getElementsByTagName('body')[0].classList.remove('modal-open');
-    const csrfToken = getContentOfToken('csrf-token');
     const formData = getFormDataAndAppend([
       { key: 'saw_onboarding', value: true },
     ]);
@@ -249,16 +203,10 @@ export default class Onboarding extends Component {
         null,
       );
     }
-    apiUtil
-      .sendOnboardingUpdate(csrfToken, formData)
-      .then(json => {
-        this.setState({ showOnboarding: json.outcome === 'onboarding opened' });
-        // console.log('this is special')
-        // console.log(this.state)
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    const json = await apiUtil.sendOnboardingUpdate(formData);
+    this.setState({ showOnboarding: json.outcome === 'onboarding opened' });
+    // console.log('this is special')
+    // console.log(this.state)
   };
 
   toggleOnboardingSlide = () => {
@@ -354,7 +302,8 @@ export default class Onboarding extends Component {
   };
 
   render() {
-    if (this.state.showOnboarding) {
+    const { showOnboarding } = this.state;
+    if (showOnboarding) {
       return (
         <div className="global-modal" style="display:none">
           <div className="global-modal-bg">
