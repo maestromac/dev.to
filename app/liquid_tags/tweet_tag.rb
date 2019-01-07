@@ -49,7 +49,7 @@ class TweetTag < LiquidTagBase
               doc.div(class: "ltag__twitter-tweet__body") { doc.text @tweet.processed_text.html_safe }
               doc.div(class: "ltag__twitter-tweet__date") { doc.text @tweet.tweeted_at.strftime("%H:%M %p - %d %b %Y") }
               # +quote_div + \
-              doc.div(class: "ltag__twitter-tweet__actions") do |div|
+              doc.div(class: "ltag__twitter-tweet__actions") do |_div|
                 doc.a(class: "ltag__twitter-tweet__actions__button", href: "https://twitter.com/intent/tweet?in_reply_to=#{@id}") do
                   # img(src: image_tag("/assets/twitter-reply-action.svg"), alt: "")
                 end
