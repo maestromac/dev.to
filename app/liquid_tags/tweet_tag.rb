@@ -31,28 +31,45 @@ class TweetTag < LiquidTagBase
       quoted_status = @tweet.full_fetched_object_serialized[:quoted_status]
       quote_div = "<div class='ltag__twitter-tweet__quote'><div class='ltag__twitter-tweet__quote__header'><span class='ltag__twitter-tweet__quote__header__name'>#{quoted_status[:user][:name]}</span> @#{quoted_status[:user][:screen_name]}</div>#{quoted_status[:full_text]}</div>"
     end
-    "<blockquote "\
-      'class="ltag__twitter-tweet" data-url="https://twitter.com/' + @tweet.twitter_username + "/status/" + @id + '">'\
-      +media_div + \
-      '<div class="ltag__twitter-tweet__main" data-url="https://twitter.com/' + @tweet.twitter_username + "/status/" + @id + '">'\
-      '<div class="ltag__twitter-tweet__header">'\
-      '<img class="ltag__twitter-tweet__profile-image" src="' + @tweet.full_fetched_object_serialized[:user][:profile_image_url_https] + '"/>'\
-      '<div class="ltag__twitter-tweet__full-name">' + @tweet.twitter_name + "</div>"\
-      '<div class="ltag__twitter-tweet__username">@' + @tweet.twitter_username + "</div>"\
-      '<div class="ltag__twitter-tweet__twitter-logo">'\
-      '<img src="' + ActionController::Base.helpers.asset_path("twitter.svg") + '" />'\
-      "</div>"\
-      "</div>"\
-      '<div class="ltag__twitter-tweet__body">' + @tweet.processed_text.html_safe + "</div>"\
-      '<div class="ltag__twitter-tweet__date">' + @tweet.tweeted_at.strftime("%H:%M %p - %d %b %Y") + "</div>"\
-      +quote_div + \
-      '<div class="ltag__twitter-tweet__actions">'\
-        '<a href= "https://twitter.com/intent/tweet?in_reply_to=' + @id + '" class="ltag__twitter-tweet__actions__button">' + image_tag("/assets/twitter-reply-action.svg") + "</a>"\
-        '<a href= "https://twitter.com/intent/retweet?tweet_id=' + @id + '" class="ltag__twitter-tweet__actions__button">' + image_tag("/assets/twitter-retweet-action.svg") + "</a>" + @tweet.retweet_count.to_s + \
-      '<a href= "https://twitter.com/intent/like?tweet_id=' + @id + '" class="ltag__twitter-tweet__actions__button">' + image_tag("/assets/twitter-like-action.svg") + "</a>" + @tweet.favorite_count.to_s + \
-      "</div>"\
-      "</div>"\
-    "</blockquote>"
+
+    builder = Nokogiri::HTML::Builder.new do |doc|
+      doc.html do
+        doc.body(onload: "") do
+          doc.blockquote(class: "ltag__twitter-tweet", "data-url" => "https://twitter.com/#{@tweet.twitter_username}/status/#{@id}") do
+            # +media_div + \
+            doc.div(class: "ltag__twitter-tweet__main", "data-url" => "https://twitter.com/#{@tweet.twitter_username}/status/#{@id}") do
+              doc.div(class: "ltag__twitter-tweet__header") do
+                doc.img(class: "ltag__twitter-tweet__profile-image", src: @tweet.full_fetched_object_serialized[:user][:profile_image_url_https])
+                doc.div(class: "ltag__twitter-tweet__full-name") { doc.text @tweet.twitter_name }
+                doc.div(class: "ltag__twitter-tweet__username") { doc.text @tweet.twitter_username }
+                doc.div(class: "ltag__twitter-tweet__twitter-logo") do
+                  doc.img(src: ActionController::Base.helpers.asset_path("twitter.svg"))
+                end
+              end
+              doc.div(class: "ltag__twitter-tweet__body") { doc.text @tweet.processed_text.html_safe }
+              doc.div(class: "ltag__twitter-tweet__date") { doc.text @tweet.tweeted_at.strftime("%H:%M %p - %d %b %Y") }
+              # +quote_div + \
+              doc.div(class: "ltag__twitter-tweet__actions") do |div|
+                doc.a(class: "ltag__twitter-tweet__actions__button", href: "https://twitter.com/intent/tweet?in_reply_to=#{@id}") do
+                  # img(src: image_tag("/assets/twitter-reply-action.svg"), alt: "")
+                end
+
+                doc.a(class: "ltag__twitter-tweet__actions__button", href: "https://twitter.com/intent/retweet?tweet_id=#{@id}") do
+                  # img(src: image_tag("/assets/twitter-retweet-action.svg"), alt: "")
+                end
+                doc.text @tweet.retweet_count.to_s
+
+                doc.a(class: "ltag__twitter-tweet__actions__button", href: "https://twitter.com/intent/like?tweet_id=#{@id}") do
+                  # img(src: image_tag("/assets/twitter-like-action.svg"), alt: "")
+                end
+                doc.text @tweet.favorite_count.to_s
+              end
+            end
+          end
+        end
+      end
+    end
+    builder.to_html
   end
 
   def self.script
@@ -95,5 +112,6 @@ class TweetTag < LiquidTagBase
   end
 end
 
-Liquid::Template.register_tag("tweet", TweetTag)
-Liquid::Template.register_tag("twitter", TweetTag)
+["tweet", "twitter"].each do |tag_name|
+  Liquid::Template.register_tag(tag_name, TweetTag)
+end
