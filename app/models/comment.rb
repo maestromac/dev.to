@@ -13,8 +13,9 @@ class Comment < ApplicationRecord
                                                     ancestry
                                                     commentable_id
                                                     commentable_type] }
-  validates :commentable_id, presence: true
+  validates :commentable, :commentable_id, :commentable_type, presence: true
   validates :commentable_type, inclusion: { in: %w(Article PodcastEpisode) }
+  # validates :commentable, if: [Proc.new { |c| !c.published? }]
   validates :user_id, presence: true
 
   after_create   :after_create_checks
@@ -25,7 +26,7 @@ class Comment < ApplicationRecord
   after_create   :send_email_notification, if: :should_send_email_notification?
   after_create   :create_first_reaction
   after_create   :send_to_moderator
-  before_save    :set_markdown_character_count
+  after_save    :set_markdown_character_count
   before_create  :adjust_comment_parent_based_on_depth
   after_update   :update_notifications, if: Proc.new { |comment| comment.saved_changes.include? "body_markdown" }
   after_update   :remove_notifications, if: :deleted
@@ -174,22 +175,6 @@ class Comment < ApplicationRecord
     end
   end
 
-  def sharemeow_link
-    user_image = ProfileImage.new(user)
-    user_image_link = Rails.env.production? ? user_image.get_link : user_image.get_external_link
-    ShareMeowClient.image_url(
-      template: "DevComment",
-      options: {
-        content: body_markdown || processed_html,
-        name: user.name,
-        subject_name: commentable.title,
-        user_image_link: user_image_link,
-        background_color: user.bg_color_hex,
-        text_color: user.text_color_hex
-      },
-    )
-  end
-
   def self.comment_async_bust(commentable, username)
     CacheBuster.new.bust_comment(commentable, username)
     commentable.index!
@@ -214,6 +199,8 @@ class Comment < ApplicationRecord
   end
 
   def evaluate_markdown
+    return unless body_markdown
+
     fixed_body_markdown = MarkdownFixer.modify_hr_tags(body_markdown)
     parsed_markdown = MarkdownParser.new(fixed_body_markdown)
     self.processed_html = parsed_markdown.finalize
@@ -228,7 +215,7 @@ class Comment < ApplicationRecord
   end
 
   def wrap_timestamps_if_video_present!
-    return unless commentable_type != "PodcastEpisode" && commentable.video.present?
+    return unless commentable_type != "PodcastEpisode" && commentable&.video.present?
 
     self.processed_html = processed_html.gsub(/(([0-9]:)?)(([0-5][0-9]|[0-9])?):[0-5][0-9]/) { |s| "<a href='#{commentable.path}?t=#{s}'>#{s}</a>" }
   end
@@ -322,11 +309,12 @@ class Comment < ApplicationRecord
 
   def set_markdown_character_count
     # body_markdown is actually markdown, but that's a separate issue to be fixed soon
+    return unless body_markdown
     self.markdown_character_count = body_markdown.size
   end
 
   def permissions
-    if commentable_type == "Article" && !commentable.published
+    if commentable_type == "Article" && !commentable&.published
       errors.add(:commentable_id, "is not valid.")
     end
   end
