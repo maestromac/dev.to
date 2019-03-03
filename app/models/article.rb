@@ -3,6 +3,7 @@ class Article < ApplicationRecord
   include ActionView::Helpers
   include AlgoliaSearch
   include Storext.model
+  include Surveiled
   include Reactable
 
   acts_as_taggable_on :tags

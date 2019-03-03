@@ -9,7 +9,6 @@ class ArticleObserver < ApplicationObserver
                     icon_emoji: ":writing_hand:"
 
     end
-    warned_user_ping(article)
   rescue StandardError
     puts "error"
   end
