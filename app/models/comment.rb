@@ -2,6 +2,7 @@ class Comment < ApplicationRecord
   has_ancestry
   include AlgoliaSearch
   include Reactable
+  include StatTrackable
   belongs_to :commentable, polymorphic: true
   counter_culture :commentable
   belongs_to :user
@@ -33,6 +34,7 @@ class Comment < ApplicationRecord
   validate :permissions, if: :commentable
 
   alias touch_by_reaction save
+  scope :pro_dashboard_stats, ->(ids) { where(commentable_id: ids, commentable_type: "Article") }
 
   algoliasearch per_environment: true, enqueue: :trigger_delayed_index do
     attribute :id

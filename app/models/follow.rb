@@ -2,6 +2,7 @@ class Follow < ApplicationRecord
   extend ActsAsFollower::FollowerLib
   extend ActsAsFollower::FollowScopes
 
+  include StatTrackable
   # NOTE: Follows belong to the "followable" interface, and also to followers
   belongs_to :followable, polymorphic: true
   belongs_to :follower,   polymorphic: true
@@ -23,6 +24,7 @@ class Follow < ApplicationRecord
   after_save :touch_follower
   after_create :send_email_notification, :create_chat_channel
   before_destroy :modify_chat_channel_status
+  scope :pro_dashboard_stats, ->(id) { where(followable_id: id, followable_type: "User") }
 
   validates :followable_id, uniqueness: { scope: %i[followable_type follower_id] }
 

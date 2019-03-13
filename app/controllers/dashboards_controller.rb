@@ -33,6 +33,9 @@ class DashboardsController < ApplicationController
   def pro
     authorize current_user, :pro_user?
     @current_user_article_ids = current_user.articles.pluck(:id)
+
+    @reactions_stats = Reaction.statistics(@current_user_article_ids)
+
     @this_week_reactions = ChartDecorator.decorate(Reaction.where(reactable_id: @current_user_article_ids, reactable_type: "Article").where("created_at > ?", 1.week.ago).order("created_at ASC"))
     @this_week_reactions_count = @this_week_reactions.size
     @last_week_reactions_count = Reaction.where(reactable_id: @current_user_article_ids, reactable_type: "Article").where("created_at > ? AND created_at < ?", 2.weeks.ago, 1.week.ago).size

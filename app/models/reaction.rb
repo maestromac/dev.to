@@ -1,5 +1,6 @@
 class Reaction < ApplicationRecord
   CATEGORIES = %w(like readinglist unicorn thinking hands thumbsdown vomit).freeze
+  include StatTrackable
 
   belongs_to :reactable, polymorphic: true
   belongs_to :user
@@ -20,6 +21,7 @@ class Reaction < ApplicationRecord
   after_save :update_reactable, :bust_reactable_cache, :touch_user, :async_bust
   before_destroy :update_reactable_without_delay, unless: :destroyed_by_association
   before_destroy :bust_reactable_cache_without_delay
+  scope :pro_dashboard_stats, ->(ids) { where(reactable_id: ids, reactable_type: "Article") }
 
   class << self
     def count_for_article(id)
