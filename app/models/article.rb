@@ -342,7 +342,14 @@ class Article < ApplicationRecord
   def detect_human_language
     return if language.present?
 
-    update_column(:language, LanguageDetector.new(self).detect)
+    text = <<~HEREDOC
+      #{@article.title}
+      #{@article.description + "\n" unless @article.description.include? 'From the DEV community'}
+      #{FrontMatterParser::Parser.new(:md).call(@article.body_markdown).content.split('`')[0]}
+    HEREDOC
+    response = LanguageDetector.detect(text)
+
+    update_column(:language, response["result"]) if response["confidence"] > 0.0
   end
   handle_asynchronously :detect_human_language
 
