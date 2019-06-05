@@ -46,7 +46,7 @@ Rails.application.routes.draw do
       end
     end
     resources :tags, only: %i[index show edit update]
-    resources :users, only: %i[index show edit update] do
+    resources :users, only: %i[index show update] do
       member do
         post "banish"
         post "full_delete"
@@ -97,6 +97,17 @@ Rails.application.routes.draw do
     resources :reads, only: [:create]
   end
 
+  scope module: "users" do
+    resources :settings, only: [] do
+      collection do
+        get "profile"
+        get "integration"
+        get "billing"
+        get "membership"
+        get "account"
+      end
+    end
+  end
   resources :messages, only: [:create]
   resources :chat_channels, only: %i[index show create update]
   resources :chat_channel_memberships, only: %i[create update destroy]
@@ -265,8 +276,9 @@ Rails.application.routes.draw do
     end
   end
 
-  get "/settings/(:tab)" => "users#edit"
-  get "/settings/:tab/:org_id" => "users#edit"
+  get "settings" => "users/settings#profile"
+  # get "/settings/(:tab)" => "users#edit"
+  # get "/settings/:tab/:org_id" => "users#edit"
   get "/signout_confirm" => "users#signout_confirm"
   get "/dashboard" => "dashboards#show"
   get "/dashboard/pro" => "dashboards#pro"
