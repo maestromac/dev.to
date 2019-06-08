@@ -1,6 +1,6 @@
 import { h, render } from 'preact';
 import { getUserDataAndCsrfToken } from '../chat/util';
-import getUnopenedChannels from '../src/utils/getUnopenedChannels';
+import getUnopenedChannels from './utils/getUnopenedChannels';
 
 HTMLDocument.prototype.ready = new Promise(resolve => {
   if (document.readyState !== 'loading') {
@@ -19,7 +19,7 @@ function isUserSignedIn() {
 }
 
 function renderPage() {
-  import('../src/Onboarding')
+  import('./Onboarding')
     .then(({ default: Onboarding }) => {
       const waitingForOnboarding = setInterval(function() {
         if (document.getElementById('main-head-stylesheet')) {

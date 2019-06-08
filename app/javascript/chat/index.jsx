@@ -1,5 +1,5 @@
 import { h, render } from 'preact';
-import Chat from '../chat/chat';
+import Chat from './chat';
 
 function loadElement() {
   const root = document.getElementById('chat');
