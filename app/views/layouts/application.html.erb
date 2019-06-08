@@ -4,6 +4,21 @@
     <meta charset="utf-8">
     <% title = yield(:title) %>
     <title><%= title || "#{ApplicationConfig['COMMUNITY_NAME']} Community" %></title>
+
+    <script>
+      window.lazyChunks = {
+				Onboarding: <%= core_pages? && user_signed_in? %>,
+        articleForm: <%= @lazy_chunks[:articleForm].present? %>,
+        webShare: <%= @lazy_chunks[:webShare].present? %>,
+        sidebarWidget: <%= @lazy_chunks[:sidebarWidget].present? %>,
+        Chat: <%= @lazy_chunks[:Chat].present? %>,
+        Search: <%= true %>,
+        githubRepos: <%= @lazy_chunks[:githubRepos].present? %>,
+      };
+    </script>
+
+    <%= javascript_packs_with_chunks_tag 'application', defer: true %>
+
     <% if internal_navigation? %>
       <style>
         .universal-page-content-wrapper {
@@ -33,12 +48,8 @@
           }
         }
       </style>
-      <%= javascript_packs_with_chunks_tag  "Search", defer: true %>
       <% if core_pages? %>
         <%= javascript_include_tag "base", defer: true %>
-        <% if user_signed_in? %>
-          <%= javascript_packs_with_chunks_tag "Onboarding", defer: true %>
-        <% end %>
       <% end %>
       <% if !core_pages? %>
         <%= stylesheet_link_tag "application", media: "all" %>

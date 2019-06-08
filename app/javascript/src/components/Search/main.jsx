@@ -1,5 +1,5 @@
 import { h, render } from 'preact';
-import { Search } from '../src/components/Search';
+import { Search } from './Search';
 import 'focus-visible'
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,5 +1,7 @@
 import { h, render } from 'preact';
-import SidebarWidget from '../sidebar-widget/SidebarWidget';
+import SidebarWidget from './SidebarWidget';
+
+console.log("i see you")
 
 HTMLDocument.prototype.ready = new Promise(resolve => {
   if (document.readyState !== 'loading') {
