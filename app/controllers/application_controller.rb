@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception, prepend: true
 
+  before_action :set_lazy_chunks
+
   include Pundit
 
   def require_http_auth
@@ -74,5 +76,9 @@ class ApplicationController < ActionController::Base
 
   def touch_current_user
     current_user.touch
+  end
+
+  def set_lazy_chunks
+    @lazy_chunks ||= {}
   end
 end
