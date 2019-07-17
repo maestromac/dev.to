@@ -257,6 +257,18 @@ RSpec.describe User, type: :model do
       expect(user).not_to be_valid
     end
 
+    it "does not accept invalid instagram url" do
+      user.instagram_url = "ben.com"
+      expect(user).not_to be_valid
+    end
+
+    it "accepts valid instagram url" do
+      %w[jess je_ss je_ss.tt A.z.E.r.T.y].each do |username|
+        user.instagram_url = "https://instagram.com/#{username}"
+        expect(user).to be_valid
+      end
+    end
+
     it "accepts valid https gitlab url" do
       %w[jess jess/ je-ss je_ss].each do |username|
         user.gitlab_url = "https://gitlab.com/#{username}"
@@ -514,27 +526,32 @@ RSpec.describe User, type: :model do
   end
 
   it "creates proper body class with defaults" do
-    expect(user.decorate.config_body_class).to eq("default default-article-body")
+    expect(user.decorate.config_body_class).to eq("default default-article-body pro-status-#{user.pro?}")
   end
 
   it "creates proper body class with sans serif config" do
     user.config_font = "sans_serif"
-    expect(user.decorate.config_body_class).to eq("default sans-serif-article-body")
+    expect(user.decorate.config_body_class).to eq("default sans-serif-article-body pro-status-#{user.pro?}")
   end
 
   it "creates proper body class with night theme" do
     user.config_theme = "night_theme"
-    expect(user.decorate.config_body_class).to eq("night-theme default-article-body")
+    expect(user.decorate.config_body_class).to eq("night-theme default-article-body pro-status-#{user.pro?}")
   end
 
   it "creates proper body class with pink theme" do
     user.config_theme = "pink_theme"
-    expect(user.decorate.config_body_class).to eq("pink-theme default-article-body")
+    expect(user.decorate.config_body_class).to eq("pink-theme default-article-body pro-status-#{user.pro?}")
   end
 
   it "creates proper body class with minimal light theme" do
     user.config_theme = "minimal_light_theme"
-    expect(user.decorate.config_body_class).to eq("minimal-light-theme default-article-body")
+    expect(user.decorate.config_body_class).to eq("minimal-light-theme default-article-body pro-status-#{user.pro?}")
+  end
+
+  it "creates proper body class with pro user" do
+    user.add_role(:pro)
+    expect(user.decorate.config_body_class).to eq("default default-article-body pro-status-#{user.pro?}")
   end
 
   it "inserts into mailchimp" do

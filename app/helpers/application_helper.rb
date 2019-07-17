@@ -36,6 +36,8 @@ module ApplicationHelper
       html_variants
       classified_listings
       credits
+      partnerships
+      pro_accounts
     ].include?(controller_name)
   end
 

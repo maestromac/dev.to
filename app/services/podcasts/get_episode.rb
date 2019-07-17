@@ -4,12 +4,20 @@ module Podcasts
       @podcast = podcast
     end
 
-    def call(item)
-      ep = existing_episode(item, podcast).first
-      if ep
-        Podcasts::UpdateEpisode.call(ep, item)
+    def call(item:, force_update: false)
+      item_data = item.is_a?(EpisodeRssItem) ? item : Podcasts::EpisodeRssItem.from_item(item)
+      return unless item_data.enclosure_url
+
+      episode = podcast.existing_episode(item_data)
+      if episode
+        if !episode.published_at? && item_data.pubDate
+          update_published_at(episode, item_data)
+        end
+        unreachable = !(episode.https? && episode.reachable?)
+        need_url_update = (unreachable && episode.created_at > 12.hours.ago) || force_update
+        PodcastEpisodes::UpdateMediaUrlJob.perform_later(episode.id, item_data.enclosure_url) if need_url_update
       else
-        Podcasts::CreateEpisode.call(podcast.id, item)
+        PodcastEpisodes::CreateJob.perform_later(podcast.id, item_data.to_h)
       end
     end
 
@@ -17,14 +25,11 @@ module Podcasts
 
     attr_reader :podcast
 
-    # returns empty array if an episode doesn't exist
-    def existing_episode(item, podcast)
-      # presence returns nil if the query is an empty array, otherwise returns the array
-      podcasts = PodcastEpisode.where(media_url: item.enclosure.url).presence ||
-        PodcastEpisode.where(title: item.title).presence ||
-        PodcastEpisode.where(guid: item.guid.to_s).presence ||
-        (podcast.unique_website_url? && PodcastEpisode.where(website_url: item.link).presence)
-      podcasts.to_a
+    def update_published_at(episode, item_data)
+      episode.published_at = item_data.pubDate.to_date
+      episode.save
+    rescue ArgumentError, NoMethodError => e
+      Rails.logger.error("not a valid date: #{e}")
     end
   end
 end

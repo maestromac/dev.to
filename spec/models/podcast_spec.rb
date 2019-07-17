@@ -14,6 +14,10 @@ RSpec.describe Podcast, type: :model do
       expect(podcast).to be_valid
     end
 
+    it "triggers cache busting on save" do
+      expect { podcast.save }.to have_enqueued_job.on_queue("podcasts_bust_cache").twice
+    end
+
     # Couldn't use shoulda uniqueness matchers for these tests because:
     # Shoulda uses `save(validate: false)` which skips validations
     # So an invalid record is trying to be saved but fails because of the db constraints
@@ -58,6 +62,49 @@ RSpec.describe Podcast, type: :model do
       user_podcast = build(:podcast, slug: "superorganization")
       expect(user_podcast).not_to be_valid
       expect(user_podcast.errors[:slug]).to be_present
+    end
+  end
+
+  describe "#existing_episode" do
+    let(:podcast) { create(:podcast) }
+    let(:guid) { "<guid isPermaLink=\"false\">http://podcast.example/file.mp3</guid>" }
+
+    let(:item) do
+      build(:podcast_episode_rss_item, pubDate: "2019-06-19",
+                                       enclosure_url: "https://audio.simplecast.com/2330f132.mp3",
+                                       description: "yet another podcast",
+                                       title: "lightalloy's podcast",
+                                       guid: guid,
+                                       itunes_subtitle: "hello",
+                                       content_encoded: nil,
+                                       itunes_summary: "world",
+                                       link: "https://litealloy.ru")
+    end
+
+    it "determines existing episode by media_url" do
+      episode = create(:podcast_episode, podcast: podcast, media_url: "https://audio.simplecast.com/2330f132.mp3")
+      expect(podcast.existing_episode(item)).to eq(episode)
+    end
+
+    it "determines existing episode by title" do
+      episode = create(:podcast_episode, podcast: podcast, title: "lightalloy's podcast")
+      expect(podcast.existing_episode(item)).to eq(episode)
+    end
+
+    it "determines existing episode by guid" do
+      episode = create(:podcast_episode, podcast: podcast, guid: guid)
+      expect(podcast.existing_episode(item)).to eq(episode)
+    end
+
+    it "determines existing episode by website_url" do
+      episode = create(:podcast_episode, podcast: podcast, website_url: "https://litealloy.ru")
+      expect(podcast.existing_episode(item)).to eq(episode)
+    end
+
+    it "doesn't determine existing episode by non-unique website_url" do
+      podcast.update_columns(unique_website_url?: false)
+      create(:podcast_episode, podcast: podcast, website_url: "https://litealloy.ru")
+      expect(podcast.existing_episode(item)).to eq(nil)
     end
   end
 end

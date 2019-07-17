@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   def edit
     unless current_user
       skip_authorization
-      return redirect_to "/enter"
+      return redirect_to sign_up_path
     end
     set_user
     set_tabs(params["tab"] || "profile")
@@ -18,7 +18,7 @@ class UsersController < ApplicationController
     set_user
     set_tabs(params["user"]["tab"])
     if @user.update(permitted_attributes(@user))
-      RssReader.new.delay.fetch_user(@user) if @user.feed_url.present?
+      RssReaderFetchUserJob.perform_later(@user.id)
       notice = "Your profile was successfully updated."
       if @user.export_requested?
         notice += " The export will be emailed to you shortly."

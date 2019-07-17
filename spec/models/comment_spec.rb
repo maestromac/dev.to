@@ -79,6 +79,12 @@ RSpec.describe Comment, type: :model do
     expect(comment.processed_html.include?(">1:52:30</a>")).to eq(false)
   end
 
+  it "adds rel=nofollow to links" do
+    comment.body_markdown = "this is a comment with a link: http://dev.to"
+    comment.save
+    expect(comment.processed_html.include?('rel="nofollow"')).to eq(true)
+  end
+
   it "adds a mention url if user is mentioned like @mention" do
     comment.body_markdown = "Hello @#{user.username}, you are cool."
     comment.save
@@ -120,8 +126,7 @@ RSpec.describe Comment, type: :model do
   end
 
   it "shortens long urls" do
-    comment.body_markdown = "Hello https://longurl.com/dsjkdsdsjdsdskhjdsjbhkdshjdshudsdsbhdsbiudsuidsuidsuidsuidsuidsuidsiudsiudsuidsuisduidsuidsiuiuweuiweuiewuiweuiweuiew?sdhiusduisduidsiudsuidsiusdiusdiuewiuewiuewiuweiuweiuweiuewiuweuiweuiewibsdiubdsiubdsisbdiudsbsdiusdbiu" # rubocop:disable Metrics/LineLength
-    comment.save
+    comment.update(body_markdown: "Hello https://longurl.com/#{'x' * 100}?#{'y' * 100}")
     expect(comment.processed_html.include?("...</a>")).to eq(true)
     expect(comment.processed_html.size).to be < 450
   end
@@ -175,8 +180,8 @@ RSpec.describe Comment, type: :model do
       expect(comment.title(5).length).to eq(5)
     end
 
-
     it "retains content from #processed_html" do
+      comment.update_column(:processed_html, "Hello this is a post.") # Remove randomness
       text = comment.title.gsub("...", "").delete("\n")
       expect(comment.processed_html).to include CGI.unescapeHTML(text)
     end
@@ -184,6 +189,12 @@ RSpec.describe Comment, type: :model do
     it "is converted to deleted if the comment is deleted" do
       comment.update_column(:deleted, true)
       expect(comment.title).to eq "[deleted]"
+    end
+
+    it "does not contain the wrong encoding" do
+      comment.body_markdown = "It's the best post ever. It's so great."
+      comment.save
+      expect(comment.title).not_to include "&#39;"
     end
   end
 
