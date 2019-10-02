@@ -14,11 +14,11 @@ module Redcarpet
         @options[:link_attributes]&.each do |attribute, value|
           link_attributes += %( #{attribute}="#{value}")
         end
-        if (/^(http(s*):\/\/)/m.match? link) || link.nil?
-          %(<a href="#{link}"#{link_attributes}>#{content}</a>)
-        else
-          %(<a href="//#{link}"#{link_attributes}>#{content}</a>)
-        end
+
+        uri = link
+        uri.prepend("//") if URI.parse(link).scheme.nil?
+
+        %(<a href="#{uri}"#{link_attributes}>#{content}</a>)
       end
 
       def header(title, header_number)
