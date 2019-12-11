@@ -59,7 +59,7 @@ Rails.application.routes.draw do
       end
     end
     resources :tags, only: %i[index update show]
-    resources :users, only: %i[index show edit update] do
+    resources :users, only: %i[index show update] do
       member do
         post "banish"
         post "full_delete"
@@ -304,8 +304,18 @@ Rails.application.routes.draw do
     end
   end
 
-  get "/settings/(:tab)" => "users#edit", :as => :user_settings
-  get "/settings/:tab/:org_id" => "users#edit"
+  scope module: "users" do
+    namespace :settings do
+      get "profile",  action: :edit, controller: "profile"
+      # get "/profile", to: "profile#edit"
+      # patch "/profile", to: "profile#update"
+       # resource :profile, path_names: { edit: '/' }
+    end
+  end
+
+  get "settings" => "users/settings#profile"
+  # get "/settings/(:tab)" => "users#edit", :as => :user_settings
+  # get "/settings/:tab/:org_id" => "users#edit"
   get "/signout_confirm" => "users#signout_confirm"
   get "/dashboard" => "dashboards#show"
   get "/dashboard/pro" => "dashboards#pro"
