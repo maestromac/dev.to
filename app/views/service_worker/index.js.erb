@@ -97,6 +97,7 @@
         !url.href.includes('?signin') && // Don't run on sign in.
 
         !url.href.includes('/admin') && // Don't fetch for administrate dashboard.
+        !url.href.includes('/ahoy/') && // Don't fetch for ahoy_emai redirects.
         !url.href.includes('/api/') && // Don't run on API endpoints.
         !url.href.includes('/embed/') && // Don't fetch for embeded content.
         !url.href.includes('/feed') && // Skip the RSS feed
