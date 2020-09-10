@@ -660,6 +660,15 @@ ActiveRecord::Schema.define(version: 2020_09_04_151734) do
     t.index ["provider", "user_id"], name: "index_identities_on_provider_and_user_id", unique: true
   end
 
+  create_table "images", force: :cascade do |t|
+    t.bigint "article_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.string "image"
+    t.string "source_url"
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["article_id"], name: "index_images_on_article_id"
+  end
+
   create_table "mentions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "mentionable_id"
@@ -1411,6 +1420,7 @@ ActiveRecord::Schema.define(version: 2020_09_04_151734) do
   add_foreign_key "html_variant_trials", "html_variants", on_delete: :cascade
   add_foreign_key "html_variants", "users", on_delete: :cascade
   add_foreign_key "identities", "users", on_delete: :cascade
+  add_foreign_key "images", "articles"
   add_foreign_key "mentions", "users", on_delete: :cascade
   add_foreign_key "messages", "chat_channels"
   add_foreign_key "messages", "users"

@@ -259,8 +259,25 @@ class MarkdownParser
     end
   end
 
-  def img_of_size(source, width = 880)
-    Images::Optimizer.call(source, width: width).gsub(",", "%2C")
+  def img_of_size(img_src, width = 880)
+    @source.images.build(remote_image_url: img_src).store_image!
+    # Works on initial save but what happens on the subsequent save? image get reuploaded?
+    #   - Can easily be exploited if we don't handle this
+    #   - what about find_or_create_by + storing ref url, are/should remote url be unique?
+    #     - if this is the solution then I can't automaticly delete image if it's associated to multiple articles
+    #
+    # How do I get it to automatic delete association when link is removed?
+    #   - I can't use `changed?` because this is trying to re-process from text
+    #
+    # Ideal solution: Asking user to explicitely upload image is easier. Would have to associate to user and not article.
+    #
+    # The following quote is from medium:
+    # While Medium uploads images you drop into your story for you, if you prefer,
+    # you can also easily embed an image directly from another site (like Instagram, Imgur, Flickr, or Dribbble).
+    # We’ve provided a full list of support services through embedly from which you can embed images.
+    #
+    Images::Optimizer.call(img_src, width: width).gsub(",", "%2C")
+
   end
 
   def wrap_all_images_in_links(html)
