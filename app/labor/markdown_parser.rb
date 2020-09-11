@@ -10,13 +10,16 @@ class MarkdownParser
 
   RAW_TAG_DELIMITERS = ["{", "}", "raw", "endraw", "----"].freeze
 
-  def initialize(content, source: nil, user: nil)
+  def initialize(content, source: nil, user: nil, preview: false)
     @content = content
     @source = source
     @user = user
+    @used_images = []
+    @preview = preview
   end
 
   def finalize(link_attributes: {})
+    # this needs to be in a transaction??
     options = { hard_wrap: true, filter_html: false, link_attributes: link_attributes }
     renderer = Redcarpet::Render::HTMLRouge.new(options)
     markdown = Redcarpet::Markdown.new(renderer, REDCARPET_CONFIG)
@@ -39,6 +42,7 @@ class MarkdownParser
     html = escape_colon_emojis_in_codeblock(html)
     html = unescape_raw_tag_in_codeblocks(html)
     html = wrap_all_figures_with_tags(html)
+    remove_all_unused_images
     wrap_mentions_with_links!(html)
   end
 
@@ -128,6 +132,16 @@ class MarkdownParser
                    end
     end
     doc.to_html
+  end
+
+  def remove_all_unused_images
+    return if @preview # do I really need this?
+
+    unused_images = @source.images.pluck(:source_url) - @used_images
+
+    unused_images.each do |img|
+      @source.images.find_by(source_url: img).destroy
+    end
   end
 
   private
@@ -260,24 +274,33 @@ class MarkdownParser
   end
 
   def img_of_size(img_src, width = 880)
-    @source.images.build(remote_image_url: img_src).store_image!
-    # Works on initial save but what happens on the subsequent save? image get reuploaded?
-    #   - Can easily be exploited if we don't handle this
-    #   - what about find_or_create_by + storing ref url, are/should remote url be unique?
-    #     - if this is the solution then I can't automaticly delete image if it's associated to multiple articles
-    #
-    # How do I get it to automatic delete association when link is removed?
-    #   - I can't use `changed?` because this is trying to re-process from text
-    #
-    # Ideal solution: Asking user to explicitely upload image is easier. Would have to associate to user and not article.
-    #
-    # The following quote is from medium:
-    # While Medium uploads images you drop into your story for you, if you prefer,
-    # you can also easily embed an image directly from another site (like Instagram, Imgur, Flickr, or Dribbble).
-    # We’ve provided a full list of support services through embedly from which you can embed images.
-    #
-    Images::Optimizer.call(img_src, width: width).gsub(",", "%2C")
+    if @preview
+      # remember that we don't remove anything from cloudinary so this code might be a problem
+      # but this isn't a problem when using with imgproxy
+      Images::Optimizer.call(img_src, width: width).gsub(",", "%2C")
+    else
+      image = @source.images.find_by(source_url: img_src)
 
+      unless image
+        image = @source.images.build(remote_image_url: img_src, source_url: img_src)
+        image.store_image! unless @preview
+      end
+
+      # Done
+      # - make sure it doesn't `store_image!` twice
+      # - don't duplicate upload when updating
+      # - remove image when not in use
+      # - don't store when previewing
+      #
+      # Not-done
+      # - but what if things doesn't go well and the image isn't stored or removed when needed?
+      #   - if user wantd to remove image, but the update failed, does that mean image is removed already???
+      # - Proper follow up to bad image url
+
+      # if it all worked out
+      @used_images << img_src
+      Images::Optimizer.call(image.image_url, width: width).gsub(",", "%2C")
+    end
   end
 
   def wrap_all_images_in_links(html)
