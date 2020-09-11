@@ -136,6 +136,8 @@ class MarkdownParser
 
   def remove_all_unused_images
     return if @preview # do I really need this?
+    return unless @source
+    return if @source.class == Comment
 
     unused_images = @source.images.pluck(:source_url) - @used_images
 
