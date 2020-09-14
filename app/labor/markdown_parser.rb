@@ -19,7 +19,6 @@ class MarkdownParser
   end
 
   def finalize(link_attributes: {})
-    # this needs to be in a transaction??
     options = { hard_wrap: true, filter_html: false, link_attributes: link_attributes }
     renderer = Redcarpet::Render::HTMLRouge.new(options)
     markdown = Redcarpet::Markdown.new(renderer, REDCARPET_CONFIG)
@@ -278,6 +277,7 @@ class MarkdownParser
   def img_of_size(img_src, width = 880)
     if @preview
       # remember that we don't remove anything from cloudinary so this code might be a problem
+      # because an image is still stored somewhere
       # but this isn't a problem when using with imgproxy
       Images::Optimizer.call(img_src, width: width).gsub(",", "%2C")
     else
@@ -289,17 +289,19 @@ class MarkdownParser
       end
 
       # Done
-      # - make sure it doesn't `store_image!` twice
+      # - make sure it doesn't try to `store_image!` twice
       # - don't duplicate upload when updating
       # - remove image when not in use
       # - don't store when previewing
       #
       # Not-done
-      # - but what if things doesn't go well and the image isn't stored or removed when needed?
-      #   - if user wantd to remove image, but the update failed, does that mean image is removed already???
-      # - Proper follow up to bad image url
+      # - What should happen when image failed to upload? raise an error or show broken image?
+      # - Because this is a very synchronous action, we can run into scenario where something else fails during an update,
+      #   causing the image to be removed or uploaded unintentionally.
+      # - If user already uploaded image through the editor, IGNORE it!
+      #   - this will need to be able to know regardless of Forem and where the image is hosted
+      # - are we offering users option to embed their own images without it being uploaded to us?
 
-      # if it all worked out
       @used_images << img_src
       Images::Optimizer.call(image.image_url, width: width).gsub(",", "%2C")
     end
