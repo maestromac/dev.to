@@ -59,15 +59,15 @@ gem "liquid", "~> 5.0" # A secure, non-evaling end user template engine with aes
 gem "nokogiri", "~> 1.11" # HTML, XML, SAX, and Reader parser
 gem "octokit", "~> 4.20" # Simple wrapper for the GitHub API
 gem "oj", "~> 3.11" # JSON parser and object serializer
-gem "omniauth", "~> 1.9" # A generalized Rack framework for multiple-provider authentication
+gem "omniauth", "~> 2.0" # A generalized Rack framework for multiple-provider authentication
 gem "omniauth-apple", "~> 1.0" # OmniAuth strategy for Sign In with Apple
 gem "omniauth-facebook", "~> 8.0" # OmniAuth strategy for Facebook
-gem "omniauth-github", "~> 1.3" # OmniAuth strategy for GitHub
+gem "omniauth-github", "~> 2.0" # OmniAuth strategy for GitHub
 gem "omniauth-twitter", "~> 1.4" # OmniAuth strategy for Twitter
 gem "parallel", "~> 1.20" # Run any kind of code in parallel processes
 gem "patron", "~> 0.13.3" # HTTP client library based on libcurl, used with Elasticsearch to support http keep-alive connections
 gem "pg", "~> 1.2" # Pg is the Ruby interface to the PostgreSQL RDBMS
-gem "puma", "~> 5.1.1" # Puma is a simple, fast, threaded, and highly concurrent HTTP 1.1 server
+gem "puma", "~> 5.2.0" # Puma is a simple, fast, threaded, and highly concurrent HTTP 1.1 server
 gem "pundit", "~> 2.1" # Object oriented authorization for Rails applications
 gem "pusher", "~> 1.4" # Ruby library for Pusher Channels HTTP API
 gem "pusher-push-notifications", "~> 1.3" # Pusher Push Notifications Ruby server SDK
