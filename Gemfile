@@ -29,7 +29,7 @@ gem "devise", "~> 4.7" # Flexible authentication solution for Rails
 gem "devise_invitable", "~> 2.0.3" # Allows invitations to be sent for joining
 gem "dogstatsd-ruby", "~> 4.8" # A client for DogStatsD, an extension of the StatsD metric server for Datadog
 gem "doorkeeper", "~> 5.4" # Oauth 2 provider
-gem "elasticsearch", "~> 7.10" # Powers DEVs core search functionality
+gem "elasticsearch", "~> 7.11" # Powers DEVs core search functionality
 gem "email_validator", "~> 2.2" # Email validator for Rails and ActiveModel
 gem "emoji_regex", "~> 3.2" # A pair of Ruby regular expressions for matching Unicode Emoji symbols
 gem "fastly", "~> 3.0" # Client library for the Fastly acceleration system
@@ -39,7 +39,7 @@ gem "flipper", "~> 0.20.3" # Feature flipping / flags for Ruby
 gem "flipper-active_record", "~> 0.20.3" # Store Flipper flags in ActiveRecord
 gem "flipper-ui", "~> 0.20.3"
 gem "fog-aws", "~> 3.8" # 'fog' gem to support Amazon Web Services
-gem "front_matter_parser", "~> 0.2" # Parse a front matter from syntactically correct strings or files
+gem "front_matter_parser", "~> 1.0" # Parse a front matter from syntactically correct strings or files
 gem "gemoji", "~> 4.0.0.rc2" # Character information and metadata for standard and custom emoji
 gem "gibbon", "~> 3.3" # API wrapper for MailChimp's API
 gem "honeybadger", "~> 4.7" # Used for tracking application errors
@@ -104,7 +104,7 @@ gem "store_attribute", "~> 0.8.1" # ActiveRecord extension which adds typecastin
 gem "storext", "~> 3.3" # Add type-casting and other features on top of ActiveRecord::Store.store_accessor
 gem "stripe", "~> 5.29" # Ruby library for the Stripe API
 gem "strong_migrations", "~> 0.7" # Catch unsafe migrations
-gem "twilio-ruby", "~> 5.46" # The official library for communicating with the Twilio REST API
+gem "twilio-ruby", "~> 5.47" # The official library for communicating with the Twilio REST API
 gem "twitter", "~> 7.0" # A Ruby interface to the Twitter API
 gem "uglifier", "~> 4.2" # Uglifier minifies JavaScript files
 gem "ulid", "~> 1.2" # Universally Unique Lexicographically Sortable Identifier implementation for Ruby
