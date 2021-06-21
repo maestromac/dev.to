@@ -80,7 +80,12 @@ jobs:
         - bin/test-console-check
         - yarn build-storybook
         - yarn cypress install
-        - bin/e2e-ci
+        - bin/e2e-ci # would need to exclude admin e2e specs or it's redundant work.
+    - stage: Test
+      name: "e2e admin"
+      script:
+        - yarn cypress install
+        - bin/e2e-ci spec/file/path # OR another dedicated e2e commnd in package.json
 
     - stage: Deploy
       name: Deploy DEV
