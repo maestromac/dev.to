@@ -83,7 +83,7 @@ gem "recaptcha", "~> 5.8", require: "recaptcha/rails" # Helpers for the reCAPTCH
 gem "redcarpet", "~> 3.5" # A fast, safe and extensible Markdown to (X)HTML parser
 
 gem "redis", "~> 4.5.1" # Redis ruby client
-gem "redis-actionpack", "5.2.0" # Redis session store for ActionPack. Used for storing the Rails session in Redis.
+gem "redis-actionpack", "5.3.0" # Redis session store for ActionPack. Used for storing the Rails session in Redis.
 gem "rpush", "~> 6.0" # Push Notification library for Rails
 gem "rpush-redis", "~> 1.1" # Redis module capability for rpush library
 
@@ -140,7 +140,7 @@ group :development, :test do
   gem "pry", "~> 0.14" # An IRB alternative and runtime developer console
   gem "pry-rails", "~> 0.3" # Use Pry as your rails console
   gem "rspec-rails", "~> 5.0" # rspec-rails is a testing framework for Rails 3+
-  gem "rubocop", "~> 1.24", require: false # Automatic Ruby code style checking tool
+  gem "rubocop", "~> 1.25", require: false # Automatic Ruby code style checking tool
   gem "rubocop-performance", "~> 1.13", require: false # A collection of RuboCop cops to check for performance optimizations in Ruby code
   gem "rubocop-rails", "~> 2.13", require: false # Automatic Rails code style checking tool
   gem "rubocop-rspec", "~> 2.7", require: false # Code style checking for RSpec files
