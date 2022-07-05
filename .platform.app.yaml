@@ -20,8 +20,9 @@ variables:
         # DEFAULT_BUNDLER_VERSION: "2.2.26" # in case none is mentioned in Gemfile.lock
         EXECJS_RUNTIME: 'Node'
         NODE_ENV: 'production'
-        NODE_VERSION: v14.17.6
-        NVM_VERSION: v0.38.0
+        # NODE_VERSION: v14.17.6
+        NODE_VERSION: v16
+        NVM_VERSION: v0.39.0
         RACK_ENV: 'production'
         RAILS_ENV: 'production'
         RAILS_LOG_TO_STDOUT: '1'
