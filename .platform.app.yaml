@@ -58,6 +58,7 @@ hooks:
 
         # precompile assets
         echo "Precompiling assets"
+        npm install @honeybadger-io/js
         # We copy the webpacker directory to the Platform.sh cache directory for
         # safe keeping, then restore from there on the next build. That allows
         # bundler to skip downloading code it doesn't need to.
