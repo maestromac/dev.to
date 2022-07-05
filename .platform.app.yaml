@@ -58,8 +58,8 @@ hooks:
         rsync -az --delete vendor/bundle/ "$PLATFORM_CACHE_DIR/bundle/"
 
         # install packages? k
+        echo "install packages k"
         npm install @honeybadger-io/js
-        npm install @storybook/addon-knobs
         yarn add ahoy.js
 
         # precompile assets
