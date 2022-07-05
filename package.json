@@ -39,13 +39,14 @@
   },
   "homepage": "https://github.com/forem/forem#readme",
   "devDependencies": {
+    "react": "17",
     "@babel/eslint-parser": "^7.18.2",
     "@faker-js/faker": "^7.3.0",
     "@knapsack-pro/cypress": "^4.6.0",
     "@storybook/addon-a11y": "^6.4.22",
     "@storybook/addon-actions": "^6.5.9",
     "@storybook/addon-docs": "^6.5.9",
-    "@storybook/addon-knobs": "^6.4.20",
+    "@storybook/addon-knobs": "^6.4.0",
     "@storybook/addon-storysource": "^6.4.22",
     "@storybook/addons": "^6.4.20",
     "@storybook/builder-webpack5": "^6.5.9",
@@ -97,6 +98,7 @@
     "webpack-dev-server": "^3.11.3"
   },
   "dependencies": {
+    "react": "17",
     "@babel/core": "^7.18.5",
     "@babel/plugin-proposal-class-properties": "^7.16.0",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
