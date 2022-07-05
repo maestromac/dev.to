@@ -50,12 +50,12 @@ hooks:
         # We copy the bundle directory to the Platform.sh cache directory for
         # safe keeping, then restore from there on the next build. That allows
         # bundler to skip downloading code it doesn't need to.
-        [ -d "$PLATFORM_CACHE_DIR/bundle" ] && \
-            rsync -az --delete "$PLATFORM_CACHE_DIR/bundle/" vendor/bundle/
-        mkdir -p "$PLATFORM_CACHE_DIR/bundle"
+        # [ -d "$PLATFORM_CACHE_DIR/bundle" ] && \
+        #     rsync -az --delete "$PLATFORM_CACHE_DIR/bundle/" vendor/bundle/
+        # mkdir -p "$PLATFORM_CACHE_DIR/bundle"
         bundle install
         # synchronize updated cache for next build
-        rsync -az --delete vendor/bundle/ "$PLATFORM_CACHE_DIR/bundle/"
+        # rsync -az --delete vendor/bundle/ "$PLATFORM_CACHE_DIR/bundle/"
 
         # install packages? k
         echo "install packages k"
