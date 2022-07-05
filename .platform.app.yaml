@@ -1,5 +1,7 @@
 name: 'forem-platform'
 type: 'ruby:3.0'
+disk: 2048
+
 relationships:
     database: "database:postgresql"
 
