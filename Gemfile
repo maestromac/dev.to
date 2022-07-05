@@ -8,6 +8,7 @@ group :production do
   gem "hypershield", "~> 0.2.2" # Allow admins to query data via internal
   gem "nakayoshi_fork", "~> 0.0.4" # solves CoW friendly problem on MRI 2.2 and later
   gem "rack-host-redirect", "~> 1.3" # Lean and simple host redirection via Rack middleware
+  gem "unicorn", "~> 6.1"
 end
 
 gem "active_record_union", "~> 1.3" # Adds proper union and union_all methods to ActiveRecord::Relation

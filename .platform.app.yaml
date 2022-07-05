@@ -74,7 +74,7 @@ hooks:
         # We dont need secret here https://github.com/rails/rails/issues/32947
         SECRET_KEY_BASE=1 bundle exec rails assets:precompile
         rsync -az --delete $RAILS_TMP/cache/webpacker/ "$PLATFORM_CACHE_DIR/webpacker/"
-    deploy: bundle exec rake db:migrate
+    deploy: bundle exec rake forem:health_check_token
 
 mounts:
     "/log":
