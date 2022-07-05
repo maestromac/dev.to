@@ -56,9 +56,12 @@ hooks:
         # synchronize updated cache for next build
         rsync -az --delete vendor/bundle/ "$PLATFORM_CACHE_DIR/bundle/"
 
+        # install NPM packages? k
+        npm install @honeybadger-io/js
+        npm install ahoy
+
         # precompile assets
         echo "Precompiling assets"
-        npm install @honeybadger-io/js
         # We copy the webpacker directory to the Platform.sh cache directory for
         # safe keeping, then restore from there on the next build. That allows
         # bundler to skip downloading code it doesn't need to.
