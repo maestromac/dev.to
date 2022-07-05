@@ -56,9 +56,9 @@ hooks:
         # synchronize updated cache for next build
         rsync -az --delete vendor/bundle/ "$PLATFORM_CACHE_DIR/bundle/"
 
-        # install NPM packages? k
+        # install packages? k
         npm install @honeybadger-io/js
-        npm install ahoy
+        yarn add ahoy.js
 
         # precompile assets
         echo "Precompiling assets"
