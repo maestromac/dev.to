@@ -26,8 +26,8 @@ variables:
         RAILS_ENV: 'production'
         RAILS_LOG_TO_STDOUT: '1'
         RAILS_TMP: '/tmp'
-        HONEYBADGER_API_KEY: "k"
-        HONEYBADGER_JS_API_KEY: "k"
+        HONEYBADGER_API_KEY: "hbp_prBwqgd6oGruVKoUY5qMTzDBXKJKY12AZWEL"
+        HONEYBADGER_JS_API_KEY: "hbp_Hh2Cqv6kXLf2K7XpENjvCBPuNCU8mE10d5x8"
 
 hooks:
     build: |
