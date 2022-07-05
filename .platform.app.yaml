@@ -1,5 +1,5 @@
 name: 'forem-platform'
-type: 'ruby:3.0.2'
+type: 'ruby:3.0'
 disk: 2048
 
 relationships:
