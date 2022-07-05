@@ -10,7 +10,7 @@ group :production do
   gem "rack-host-redirect", "~> 1.3" # Lean and simple host redirection via Rack middleware
 end
 
-gem "unicorn", "~> 6.0"
+# gem "unicorn", "~> 6.0"
 gem "active_record_union", "~> 1.3" # Adds proper union and union_all methods to ActiveRecord::Relation
 gem "acts-as-taggable-on", "~> 9.0" # A tagging plugin for Rails applications that allows for custom tagging along dynamic contexts
 gem "acts_as_follower", github: "forem/acts_as_follower", branch: "master" # Allow any model to follow any other model
