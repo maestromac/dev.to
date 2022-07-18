@@ -3,7 +3,8 @@ type: 'ruby:3.0'
 disk: 1536
 
 relationships:
-  database: "database:postgresql"
+  database: "database_service:postgresql"
+  cache: "cache_service:redis"
 
 dependencies:
   nodejs:

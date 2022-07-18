@@ -1,6 +1,6 @@
-database:
+database_service:
   type: postgresql:13
   disk: 1024
-cache:
+cache_service:
   type: redis-persistent:6.2
   disk: 256
