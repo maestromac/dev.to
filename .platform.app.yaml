@@ -1,6 +1,6 @@
 name: 'app'
 type: 'ruby:3.0'
-disk: 2048
+disk: 1536
 
 relationships:
   database: "database:postgresql"
