@@ -64,6 +64,11 @@ class AsyncInfoController < ApplicationController
   end
 
   def navigation_links
+    ids = Rails.cache.fetch("navigation_links", expires_in: NUMBER_OF_MINUTES_FOR_CACHE_EXPIRY.minutes) do
+      NavigationLink.default_section.ordered.ids
+    end
+    @default_nav_links = NavigationLink.where(id: ids).to_a
+
     # We're sending HTML over the wire hence 'render layout: false' enforces rails NOT TO look for a layout file to wrap
     # the view file - it allows us to not include the HTML headers for sending back to client.
     render layout: false
