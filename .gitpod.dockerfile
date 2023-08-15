@@ -19,6 +19,7 @@ RUN brew install rtx
 RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc
 RUN bash -c "source ~/.bashrc"
 RUN rtx install node@$NODE_VERSION
+run bash -c "node -v"
 run bash -c "npm install -g yarn"
 RUN rtx install ruby@$RUBY_VERSION
 
