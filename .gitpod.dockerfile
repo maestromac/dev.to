@@ -1,4 +1,4 @@
-FROM gitpod/workspace-postgres
+FROM gitpod/workspace-full
 
 # Install the GitHub CLI
 RUN brew install gh
@@ -19,8 +19,10 @@ RUN bash -c ". .nvm/nvm.sh && \
         npm install -g yarn"
 ENV PATH=/home/gitpod/.nvm/versions/node/v${NODE_VERSION}/bin:$PATH
 
-# Install Redis.
+# Install Redis and PostgreSQL.
 RUN sudo apt-get update \
         && sudo apt-get install -y \
         redis-server \
+        postgresql \
+        postgresql-contrib \
         && sudo rm -rf /var/lib/apt/lists/*
