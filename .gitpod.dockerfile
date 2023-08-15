@@ -17,9 +17,8 @@ ENV NODE_VERSION=16.13.1
 ENV WORKSPACE_GEM_HOME=/workspace/.gem
 RUN brew install rtx
 RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc
-RUN bash -c "source ~/.bashrc"
 RUN rtx install node@$NODE_VERSION
-RUN npm install -g yarn
+run bash -c "npm install -g yarn"
 RUN rtx install ruby@$RUBY_VERSION
 
 # RUN rtx use -g ruby@$RUBY_VERSION \
