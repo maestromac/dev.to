@@ -12,17 +12,8 @@ RUN sudo apt remove -y cmake \
 RUN brew install gh
 
 # Install rbenv and Ruby
-ENV RUBY_VERSION=3.1.4
-ENV NODE_VERSION=16.13.1
 ENV WORKSPACE_GEM_HOME=/workspace/.gem
 RUN brew install rtx
 RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc
-RUN bash -c "source ~/.bashrc"
-RUN rtx install node@$NODE_VERSION
-# run bash -c "node -v"
-# run bash -c "npm install -g yarn"
-# RUN rtx install ruby@$RUBY_VERSION
-
-# RUN rtx use -g ruby@$RUBY_VERSION \
-#   && echo "export GEM_PATH=\"${WORKSPACE_GEM_HOME}:$(gem env home)\"" >> ~/.bashrc.d/60-ruby \
-#   && echo "export GEM_HOME=\"${WORKSPACE_GEM_HOME}\"" >> ~/.bashrc.d/60-ruby
+RUN /bin/bash -c "source ~/.bashrc"
+RUN rtx install
