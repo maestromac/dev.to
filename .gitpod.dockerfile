@@ -11,9 +11,9 @@ RUN sudo apt remove -y cmake \
     && brew install cmake
 RUN brew install gh
 
-# Install rbenv and Ruby
-ENV WORKSPACE_GEM_HOME=/workspace/.gem
+# Install Ruby and Node
 RUN brew install rtx
 RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc
-RUN /bin/bash -c "source ~/.bashrc"
-RUN rtx install
+RUN bash -c "source ~/.bashrc"
+RUN rtx install node@$(cat .nvmrc)
+RUN rtx install ruby@$(cat .ruby-version)
