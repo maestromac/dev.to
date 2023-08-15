@@ -19,9 +19,9 @@ RUN brew install rtx
 RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc
 RUN bash -c "source ~/.bashrc"
 RUN rtx install node@$NODE_VERSION
-run bash -c "node -v"
-run bash -c "npm install -g yarn"
-RUN rtx install ruby@$RUBY_VERSION
+# run bash -c "node -v"
+# run bash -c "npm install -g yarn"
+# RUN rtx install ruby@$RUBY_VERSION
 
 # RUN rtx use -g ruby@$RUBY_VERSION \
 #   && echo "export GEM_PATH=\"${WORKSPACE_GEM_HOME}:$(gem env home)\"" >> ~/.bashrc.d/60-ruby \
