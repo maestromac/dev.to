@@ -1,5 +1,5 @@
 image:
-  file: .gitpod.dockerfile
+  file: gitpod/.gitpod.dockerfile
 
 ports:
   - port: 3000
@@ -40,7 +40,7 @@ tasks:
         # Use bind mount to make $DIR backed by /workspace/cache$DIR
         sudo mount --bind /workspace/cache$DIR $DIR
       done
-    init: gp ports await 5432 && ./gitpod-init.sh
+    init: gp ports await 5432 && gitpod/gitpod-init.sh
     command: bin/startup
 
 github:
