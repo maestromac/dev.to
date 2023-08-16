@@ -8,3 +8,4 @@ echo 'APP_PROTOCOL="https://"' >> .env
 gem install solargraph
 gem install foreman
 bin/setup
+
