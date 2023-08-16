@@ -14,7 +14,7 @@ RUN sudo apt remove -y cmake \
 RUN brew install gh \
     && brew install rtx
 
-# Install rbenv and Ruby
+# Install Ruby and Node
 ENV RUBY_VERSION=3.1.4
 ENV NODE_VERSION=16.13.1
 RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc.d/50-rtx-activate
