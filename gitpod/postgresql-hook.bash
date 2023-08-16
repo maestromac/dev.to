@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Auto-start PostgreSQL server
+# ref: https://github.com/gitpod-io/workspace-images/blob/main/chunks/tool-postgresql/postgresql-hook.bash
 (
 	if mkdir /tmp/.pgsql_lock 2>/dev/null; then {
 		target="${PGWORKSPACE}"
