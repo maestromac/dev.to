@@ -39,9 +39,8 @@ tasks:
         # Now /workspace/cache$DIR exists.
         # Use bind mount to make $DIR backed by /workspace/cache$DIR
         sudo mount --bind /workspace/cache$DIR $DIR
-      gp ports await 5432
-      sleep 1
-    init: ./gitpod-init.sh
+      done
+    init: gp ports await 5432 && ./gitpod-init.sh
     command: bin/startup
 
 github:
