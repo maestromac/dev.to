@@ -19,9 +19,9 @@ RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc.d/10-rtx-activate
 ENV WORKSPACE_GEM_HOME=/workspace/.gem
 ENV RUBY_VERSION=3.1.4
 RUN rtx install ruby@$RUBY_VERSION
-RUN echo "export GEM_PATH=\"${WORKSPACE_GEM_HOME}:$(rtx x ruby -- gem env home)\"" >> ~/.bashrc.d/60-ruby \
-      && echo "export GEM_HOME=\"${WORKSPACE_GEM_HOME}\"" >> ~/.bashrc.d/60-ruby \
-      && echo "export PATH=\"${WORKSPACE_GEM_HOME}/bin:\$PATH\"" >> ~/.bashrc.d/60-ruby
+RUN echo "export GEM_PATH=\"${WORKSPACE_GEM_HOME}:$(rtx x ruby@$RUBY_VERSION -- gem env home)\"" >> ~/.bashrc.d/60-ruby \
+      && echo "export GEM_HOME=\"${WORKSPACE_GEM_HOME}\"" >> ~/.bashrc.d/60-ruby
+ENV PATH="${WORKSPACE_GEM_HOME}/bin:$PATH"
 
 # Install Node
 ENV NODE_VERSION=16.13.1
