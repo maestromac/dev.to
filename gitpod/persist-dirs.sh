@@ -14,10 +14,12 @@ for DIR in "${CACHE_DIRS[@]}"; do
   echo "Copying $DIR to /workspace/cache$DIR"
   echo $(ls /workspace/)
   if [ ! -d /workspace/cache$DIR ]; then
+    echo "Creating /workspace/cache$DIR"
     sudo cp -rp $DIR /workspace/cache$DIR
+    echo $(ls /workspace/cache)
     sudo rm -rf $DIR/*
+    echo $(ls /workspace/cache)
   fi
-  mkdir -p /workspace/cache$DIR # make sure it exists even if cp fails
   # Now /workspace/cache$DIR exists.
   # Use bind mount to make $DIR backed by /workspace/cache$DIR
   echo "Mounting $DIR to /workspace/cache$DIR"
