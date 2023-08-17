@@ -19,13 +19,15 @@ RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc.d/10-rtx-activate
 ENV WORKSPACE_GEM_HOME=/workspace/.gem
 ENV RUBY_VERSION=3.1.4
 RUN rtx install ruby@$RUBY_VERSION
-RUN echo "export GEM_PATH=\"${WORKSPACE_GEM_HOME}:$(rtx x ruby@$RUBY_VERSION -- gem env home)\"" >> ~/.bashrc.d/60-ruby \
-      && echo "export GEM_HOME=\"${WORKSPACE_GEM_HOME}\"" >> ~/.bashrc.d/60-ruby
 ENV PATH="${WORKSPACE_GEM_HOME}/bin:$PATH"
+ENV GEM_PATH="${WORKSPACE_GEM_HOME}:$(rtx x ruby@$RUBY_VERSION -- gem env home)"
+ENV GEM_HOME="${WORKSPACE_GEM_HOME}"
 
 # Install Node
 ENV NODE_VERSION=16.13.1
 RUN rtx install node@$NODE_VERSION
+RUN rtx x node@$NODE_VERSION -- npm install -g yarn
+ENV PATH="${rtx x node@$NODE_VERSION -- npm config get prefix}/bin:$PATH"
 
 # Install Redis
 RUN sudo apt-get update \
