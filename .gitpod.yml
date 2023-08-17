@@ -14,10 +14,9 @@ ports:
 tasks:
   - name: Forem Server
     before: >
-      gitpod/persist-dirs.sh &&
       redis-server & gp ports await 5432 &&
       sleep 1
-    init: gp ports await 5432 && gitpod/gitpod-init.sh
+    init: gitpod/gitpod-init.sh
     command: bin/startup
   - name: Open Site
     command: >

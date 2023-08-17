@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+rtx doctor
 npm install -g yarn
 cp .env_sample .env
 echo "APP_DOMAIN=\"$(gp url 3000 | cut -f 3 -d /)\"" >> .env
