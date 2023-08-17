@@ -13,13 +13,19 @@ RUN sudo apt remove -y cmake \
 # Install the GitHub CLI and rtx
 RUN brew install gh \
     && brew install rtx
-
-# Install Ruby and Node
-ENV RUBY_VERSION=3.1.4
-ENV NODE_VERSION=16.13.1
 RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc.d/10-rtx-activate
-RUN rtx install node@$NODE_VERSION
+
+# Install Ruby
+ENV WORKSPACE_GEM_HOME=/workspace/.gem
+ENV RUBY_VERSION=3.1.4
+RUN echo "export GEM_PATH=\"${WORKSPACE_GEM_HOME}:$(gem env home)\"" >> ~/.bashrc.d/60-ruby \
+      && echo "export GEM_HOME=\"${WORKSPACE_GEM_HOME}\"" >> ~/.bashrc.d/60-ruby \
+      && echo "export PATH=\"${WORKSPACE_GEM_HOME}/bin:\$PATH\"" >> ~/.bashrc.d/60-ruby
 RUN rtx install ruby@$RUBY_VERSION
+
+# Install Node
+ENV NODE_VERSION=16.13.1
+RUN rtx install node@$NODE_VERSION
 
 # Install Redis
 RUN sudo apt-get update \
