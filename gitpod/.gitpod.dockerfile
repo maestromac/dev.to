@@ -17,7 +17,7 @@ RUN brew install gh \
 # Install Ruby and Node
 ENV RUBY_VERSION=3.1.4
 ENV NODE_VERSION=16.13.1
-RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc.d/50-rtx-activate
+RUN echo 'eval "$(rtx activate bash)"' >> ~/.bashrc.d/10-rtx-activate
 RUN rtx install node@$NODE_VERSION
 RUN rtx install ruby@$RUBY_VERSION
 
