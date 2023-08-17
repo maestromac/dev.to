@@ -27,7 +27,7 @@ ENV GEM_HOME="${WORKSPACE_GEM_HOME}"
 ENV NODE_VERSION=16.13.1
 RUN rtx install node@$NODE_VERSION
 RUN rtx x node@$NODE_VERSION -- npm install -g yarn
-ENV PATH="${rtx x node@$NODE_VERSION -- npm config get prefix}/bin:$PATH"
+ENV PATH="$(rtx x node@$NODE_VERSION -- npm config get prefix)/bin:$PATH"
 
 # Install Redis
 RUN sudo apt-get update \
