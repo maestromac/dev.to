@@ -13,8 +13,27 @@ ports:
 
 tasks:
   - name: Forem Server
-    before: >
-      redis-server & gp ports await 5432 &&
+    before: |
+      # Make sure some folders not in /workspace persist between worksapce restarts.
+      # You may add additional directories to this list.
+      declare -a CACHE_DIRS=(
+        $HOME/.local
+      )
+      for DIR in "${CACHE_DIRS[@]}"; do
+        mkdir -p $(dirname /workspace/cache$DIR)
+        mkdir -p $DIR # in case $DIR doesn't already exist
+        # On a fresh start with no prebuilds, we move existing directory
+        # to /workspace. 'sudo mv' fails with 'no permission', I don't know why
+        if [ ! -d /workspace/cache$DIR ]; then
+          sudo cp -rp $DIR /workspace/cache$DIR
+          sudo rm -rf $DIR/*
+        fi
+        mkdir -p /workspace/cache$DIR # make sure it exists even if cp fails
+        # Now /workspace/cache$DIR exists.
+        # Use bind mount to make $DIR backed by /workspace/cache$DIR
+        sudo mount --bind /workspace/cache$DIR $DIR
+      done
+      redis-server & gp ports await 5432
       sleep 1
     init: gitpod/gitpod-init.sh
     command: bin/startup
