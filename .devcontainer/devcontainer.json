@@ -1,9 +1,7 @@
 {
   "name": "Forem DEVcontainer",
-  "build": {
-    "dockerfile": "../Dockerfile",
-    "target": "devcontainer"
-  },
+  "dockerComposeFile": "../docker-compose.yml",
+	"service": "devcontainer",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "remoteEnv": {
     "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
@@ -23,8 +21,8 @@
     }
   },
   "forwardPorts": [3000],
-  "updateContentCommand": "dip provision",
-  "postCreateCommand": ".devcontainer/postCreateCommand-init.sh",
-  "postAttachCommand": ".devcontainer/postAttachCommand-init.sh",
+  // "updateContentCommand": "dip provision",
+  // "postCreateCommand": ".devcontainer/postCreateCommand-init.sh",
+  // "postAttachCommand": ".devcontainer/postAttachCommand-init.sh",
   "remoteUser": "root"
 }

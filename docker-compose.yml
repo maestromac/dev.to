@@ -50,6 +50,29 @@ x-backend: &backend
       condition: service_healthy
 
 services:
+  devcontainer:
+    <<: *backend
+    build:
+      target: devcontainer
+      context: .
+      args:
+        PG_MAJOR: '13'
+        NODE_MAJOR: '16'
+        YARN_VERSION: '1.22.18'
+    volumes:
+      - ${LOCAL_WORKSPACE_FOLDER:-.}:/workspaces/forem:cached
+      - bundle:/usr/local/bundle
+      - cypress:/root/.cache/Cypress
+      - rails_cache:/workspaces/forem/tmp/cache
+      - assets:/workspaces/forem/public/assets
+      - node_modules:/workspaces/forem/node_modules
+      - packs:/workspaces/forem/public/packs
+      - packs-test:/workspaces/forem/public/packs-test
+      - history:/usr/local/hist
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/.dockerdev/.psqlrc:/root/.psqlrc:ro
+      - /var/run/docker.sock:/var/run/docker-host.sock
+    command: sleep infinity
+
   rails:
     <<: *backend
     command: bundle exec rails
