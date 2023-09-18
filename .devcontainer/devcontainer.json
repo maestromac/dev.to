@@ -1,7 +1,8 @@
 {
   "name": "Forem DEVcontainer",
   "dockerComposeFile": "../docker-compose.yml",
-	"service": "devcontainer",
+  "service": "devcontainer",
+  "runServices": ["postgres", "redis"],
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "remoteEnv": {
     "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
@@ -20,9 +21,8 @@
       "upgradePackages": "true"
     }
   },
-  "forwardPorts": [3000],
-  // "updateContentCommand": "dip provision",
-  // "postCreateCommand": ".devcontainer/postCreateCommand-init.sh",
-  // "postAttachCommand": ".devcontainer/postAttachCommand-init.sh",
-  "remoteUser": "root"
+  "onCreateCommand": ".devcontainer/postCreateCommand-init.sh",
+  "updateContentCommand": "bin/setup",
+  "postAttachCommand": ".devcontainer/postAttachCommand-init.sh"
+  // "remoteUser": "root"
 }

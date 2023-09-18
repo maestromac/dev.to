@@ -15,7 +15,7 @@ if [ -n "$CODESPACE_NAME" ]; then
         echo "Branch is not up to date, pulling latest code"
         git pull origin $(git rev-parse --abbrev-ref HEAD) --no-rebase
         echo "Updating dependencies"
-        dip provision
+        bin/setup
     fi
 fi
 

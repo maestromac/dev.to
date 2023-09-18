@@ -52,13 +52,9 @@ x-backend: &backend
 services:
   devcontainer:
     <<: *backend
-    build:
-      target: devcontainer
-      context: .
-      args:
-        PG_MAJOR: '13'
-        NODE_MAJOR: '16'
-        YARN_VERSION: '1.22.18'
+    environment:
+      MALLOC_ARENA_MAX: 2
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-1}
     volumes:
       - ${LOCAL_WORKSPACE_FOLDER:-.}:/workspaces/forem:cached
       - bundle:/usr/local/bundle
